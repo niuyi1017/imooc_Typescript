@@ -40,7 +40,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var axios_1 = __importDefault(require("axios"));
-var imoocAnalyzer_1 = __importDefault(require("./imoocAnalyzer"));
+var webAnalyzer_1 = __importDefault(require("./webAnalyzer"));
 var Crowller = /** @class */ (function () {
     function Crowller(url, analyzer) {
         this.url = url;
@@ -60,16 +60,54 @@ var Crowller = /** @class */ (function () {
             });
         });
     };
+    Crowller.prototype.postNewWebInfo = function (data) {
+        return __awaiter(this, void 0, void 0, function () {
+            var config, res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        config = {
+                            headers: {
+                                "accessToken": "123",
+                                "refreshToken": "123",
+                                "sibat_logid": "1627026227412",
+                                "systemId": "1388006584858951682",
+                                "userId": "1083197870498279426",
+                            },
+                            data: data,
+                        };
+                        return [4 /*yield*/, axios_1.default.post("http://192.168.233.143/jinan-system-oa/web/addOrUpdateWebInfo", {
+                                headers: {
+                                    accessToken: 123,
+                                    refreshToken: 123,
+                                    sibat_logid: "1627026227412",
+                                    systemId: "1388006584858951682",
+                                    userId: "1083197870498279426",
+                                },
+                                data: data,
+                            })];
+                    case 1:
+                        res = _a.sent();
+                        return [2 /*return*/, res];
+                }
+            });
+        });
+    };
     Crowller.prototype.initSpiderProcess = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var html, courseInfo;
+            var html, webInfo, res;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.getRawHtml()];
                     case 1:
                         html = _a.sent();
-                        courseInfo = this.analyzer.analyze(html);
-                        console.log(courseInfo);
+                        webInfo = this.analyzer.analyze(html);
+                        return [4 /*yield*/, this.postNewWebInfo(webInfo)
+                            // console.log("res")
+                            // console.log(res)
+                        ];
+                    case 2:
+                        res = _a.sent();
                         return [2 /*return*/];
                 }
             });
@@ -77,6 +115,6 @@ var Crowller = /** @class */ (function () {
     };
     return Crowller;
 }());
-var url = "https://www.imooc.com/";
-var analyzer = imoocAnalyzer_1.default.getInstance();
+var url = "http://127.0.0.1:5500/info.html";
+var analyzer = webAnalyzer_1.default.getInstance();
 var crowller = new Crowller(url, analyzer);

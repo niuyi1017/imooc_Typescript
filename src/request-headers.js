@@ -1,0 +1,20 @@
+let headers = {
+  Accept: "application/json, text/plain, */*",
+  "Accept-Encoding": "gzip, deflate",
+  "Accept-Language": "zh-CN,zh;q=0.9",
+  accessToken: 123,
+  "Cache-Control": "no-cache",
+  Connection: "keep-alive",
+  "Content-Length": 3108,
+  "Content-Type": "application/json;charset=UTF-8",
+  Host: "192.168.233.143",
+  Origin: "http://localhost:8081",
+  Pragma: "no-cache",
+  Referer: "http://localhost:8081/",
+  refreshToken: 123,
+  sibat_logid: "1627026227412",
+  systemId: "1388006584858951682",
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.107 Safari/537.36",
+  userId: "1083197870498279426",
+};
