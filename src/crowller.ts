@@ -1,5 +1,4 @@
 import axios from "axios"
-
 import WebAnalyzer from "./webAnalyzer"
 
 export interface Analyzer{
@@ -26,10 +25,11 @@ class Crowller {
     try{
       const res = await axios({
         method: "POST",
-        url: "http://192.168.233.143/jinan-system-oa/web/addOrUpdateWebInfo",
+        url: "http://192.168.233.143:8078/jinan-system-oa/operation/importWebInfo",
         ...config
 
      })
+     console.log(res.data)
      
     }catch (err) {
       console.log(err.response.data)
@@ -42,15 +42,14 @@ class Crowller {
     const html = await this.getRawHtml()
     const webInfo  = this.analyzer.analyze(html)
     const res =  await this.postNewWebInfo(webInfo)
-    // console.log("res")
-    // console.log(res)
+    
   }
   constructor(private url: string, private analyzer: Analyzer){
     this.initSpiderProcess()
   }
 }
 
-const url  = "http://127.0.0.1:5500/info.html"
+const url  = "http://127.0.0.1:5500/index.html"
 const analyzer = WebAnalyzer.getInstance()
 
 const crowller = new Crowller(url, analyzer)
