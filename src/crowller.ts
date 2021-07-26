@@ -1,12 +1,14 @@
 import axios from "axios"
-import WebAnalyzer from "./webAnalyzer"
+// import WebAnalyzer from "./webAnalyzer"
+import WebListAnalyzer from "./webListAnalyzer"
 
 export interface Analyzer{
   analyze: (html: string) => any
 }
 
-class Crowller {
-  
+export class Crowller {
+  public webInfo:any
+
   async getRawHtml(){
     const response =  await axios.get(this.url)
     return response.data
@@ -41,15 +43,17 @@ class Crowller {
   async initSpiderProcess(){
     const html = await this.getRawHtml()
     const webInfo  = this.analyzer.analyze(html)
-    const res =  await this.postNewWebInfo(webInfo)
+    this.webInfo =  webInfo
+    return webInfo
+    
     
   }
   constructor(private url: string, private analyzer: Analyzer){
-    this.initSpiderProcess()
+    // this.initSpiderProcess()
   }
 }
 
-const url  = "http://127.0.0.1:5500/index.html"
-const analyzer = WebAnalyzer.getInstance()
+// const url  = "http://127.0.0.1:5500/list.html"
+// const analyzer = WebListAnalyzer.getInstance()
 
-const crowller = new Crowller(url, analyzer)
+// const crowller = new Crowller(url, analyzer)
