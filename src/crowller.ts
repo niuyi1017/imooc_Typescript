@@ -1,16 +1,23 @@
 import axios from "axios"
-// import WebAnalyzer from "./webAnalyzer"
-import WebListAnalyzer from "./webListAnalyzer"
+
 
 export interface Analyzer{
   analyze: (html: string) => any
 }
 
 export class Crowller {
-  public webInfo:any
+  private static instance: any
 
-  async getRawHtml(){
-    const response =  await axios.get(this.url)
+  static getInstance(){
+    if(!Crowller.instance){
+      Crowller.instance = new Crowller()
+    }
+    return Crowller.instance
+  }
+  
+  async getRawHtml(url:string){
+    const response =  await axios.get(url)
+    // const response =  {data: "false"}
     return response.data
   }
   async postNewWebInfo(data:any){
@@ -37,23 +44,21 @@ export class Crowller {
       console.log(err.response.data)
     }    
     
-    // return res
   }
 
-  async initSpiderProcess(){
-    const html = await this.getRawHtml()
-    const webInfo  = this.analyzer.analyze(html)
-    this.webInfo =  webInfo
-    return webInfo
-    
-    
+  async initSpiderProcess(url:string, analyzer: Analyzer){
+    try {
+      const html = await this.getRawHtml(url)
+      const webInfo  = analyzer.analyze(html)
+      return webInfo
+    }catch(err){
+      console.error(`${url} 爬取出错`, err.response.status, err.response.statusText)
+      // throw new Error(err)
+      return false;
+    }
+   
   }
-  constructor(private url: string, private analyzer: Analyzer){
-    // this.initSpiderProcess()
+  constructor( ){
   }
 }
 
-// const url  = "http://127.0.0.1:5500/list.html"
-// const analyzer = WebListAnalyzer.getInstance()
-
-// const crowller = new Crowller(url, analyzer)

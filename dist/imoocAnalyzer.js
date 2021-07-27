@@ -3,35 +3,34 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var cheerio_1 = __importDefault(require("cheerio"));
-var ImoocAnalyzer = /** @class */ (function () {
-    function ImoocAnalyzer() {
+const cheerio_1 = __importDefault(require("cheerio"));
+class ImoocAnalyzer {
+    constructor() {
     }
-    ImoocAnalyzer.getInstance = function () {
+    static getInstance() {
         if (!ImoocAnalyzer.instance) {
             ImoocAnalyzer.instance = new ImoocAnalyzer();
         }
         return ImoocAnalyzer.instance;
-    };
-    ImoocAnalyzer.prototype.getCourseInfo = function (html) {
-        var $ = cheerio_1.default.load(html);
-        var courses = $('.new-course .show .item');
-        var courseArr = [];
-        courses.map(function (key, val) {
+    }
+    getCourseInfo(html) {
+        const $ = cheerio_1.default.load(html);
+        const courses = $('.new-course .show .item');
+        const courseArr = [];
+        courses.map((key, val) => {
             courseArr.push(val);
         });
-        var courseInfo = courseArr.map(function (item) {
+        const courseInfo = courseArr.map(item => {
             return {
                 id: item.attribs["data-cid"],
                 title: item.attribs['data-title']
             };
         });
         return courseInfo;
-    };
-    ImoocAnalyzer.prototype.analyze = function (html) {
-        var courseInfo = this.getCourseInfo(html);
+    }
+    analyze(html) {
+        const courseInfo = this.getCourseInfo(html);
         return JSON.stringify(courseInfo);
-    };
-    return ImoocAnalyzer;
-}());
+    }
+}
 exports.default = ImoocAnalyzer;
