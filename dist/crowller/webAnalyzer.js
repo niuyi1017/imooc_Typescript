@@ -7,8 +7,7 @@ const cheerio_1 = __importDefault(require("cheerio"));
 const moment_1 = __importDefault(require("moment"));
 const col_1 = require("./col");
 class WebAnalyzer {
-    constructor() {
-    }
+    constructor() { }
     static getInstance() {
         if (!WebAnalyzer.instance) {
             WebAnalyzer.instance = new WebAnalyzer();
@@ -17,15 +16,15 @@ class WebAnalyzer {
     }
     getWebinfo(html) {
         const $ = cheerio_1.default.load(html);
-        let webInfo = Object.assign(Object.assign({ userId: "1083197870498279426", title: $(".area .readtitle").text(), moduleId: this._parsewebModelNode($(".dqwz").text()) }, this._parseAuthor($(".area .readinfo").text())), { images: this._parseImg($(".area .read table img")), attachments: this._parseFile($('#file_list a')), content: this._parseContent(html), sort: 0 });
-        // console.log(webInfo)
+        let webInfo = Object.assign(Object.assign({ userId: "1083197870498279426", title: $(".area .readtitle").text(), moduleId: this._parsewebModelNode($(".dqwz").text()) }, this._parseAuthor($(".area .readinfo").text())), { images: this._parseImg($(".area .read table img")), attachments: this._parseFile($("#file_list a")), content: this._parseContent(html), sort: 0 });
+        // console.log(webInfo);
         return webInfo;
     }
     // 解析所属板块
     _parsewebModelNode(text) {
         let arr = text.split(" >> ");
         let colName = arr[arr.length - 1].trim();
-        let result = col_1.cols.find(item => item.value == colName);
+        let result = col_1.cols.find((item) => item.value == colName);
         return result === null || result === void 0 ? void 0 : result.key;
     }
     // 解析作者、发布时间等基础信息
@@ -45,7 +44,7 @@ class WebAnalyzer {
         node.map((key, value) => {
             nodeArr.push(value);
         });
-        let result = nodeArr.map(item => {
+        let result = nodeArr.map((item) => {
             return {
                 status: "success",
                 name: item.attribs.src,
@@ -73,7 +72,7 @@ class WebAnalyzer {
         node.map((key, value) => {
             nodeArr.push(value);
         });
-        let result = nodeArr.map(item => {
+        let result = nodeArr.map((item) => {
             return {
                 status: "success",
                 name: item.children[0].data,
@@ -100,7 +99,7 @@ class WebAnalyzer {
         // let res =  ($(".read").html()?.split("<!--EndFragment-->")[0].toLowerCase().replace("\n", "") + '</div>').replace("\n", "")
         $(".read div").remove();
         $(".read table").remove();
-        $('#file_list ').remove();
+        $("#file_list ").remove();
         let res = $(".read").html();
         // console.log(res)
         return res;

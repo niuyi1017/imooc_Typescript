@@ -5,9 +5,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Crowller = void 0;
 const axios_1 = __importDefault(require("axios"));
+const iconv_lite_1 = __importDefault(require("iconv-lite"));
 class Crowller {
-    constructor() {
-    }
+    constructor() { }
     static getInstance() {
         if (!Crowller.instance) {
             Crowller.instance = new Crowller();
@@ -15,18 +15,35 @@ class Crowller {
         return Crowller.instance;
     }
     async getRawHtml(url) {
-        const response = await axios_1.default.get(url);
+        try {
+            // const response = await axios.get(url);
+            const response = await axios_1.default({
+                method: "GET",
+                responseType: "arraybuffer",
+                url,
+            });
+            // console.log(iconv.encodingExists("utf8"));
+            let str = iconv_lite_1.default.decode(Buffer.from(response.data), "gb2312");
+            let html = iconv_lite_1.default.encode(str, "utf8").toString();
+            console.log(str);
+            console.log(html);
+            return html;
+        }
+        catch (err) {
+            console.log(err);
+            console.log("获取html失败", url);
+            return "false";
+        }
         // const response =  {data: "false"}
-        return response.data;
     }
     async postNewWebInfo(data) {
         let config = {
             headers: {
-                "accessToken": "123",
-                "refreshToken": "123",
-                "sibat_logid": "1627026227412",
-                "systemId": "1388006584858951682",
-                "userId": "1083197870498279426",
+                accessToken: "123",
+                refreshToken: "123",
+                sibat_logid: "1627026227412",
+                systemId: "1388006584858951682",
+                userId: "1083197870498279426",
             },
             data: Object.assign({}, data),
         };

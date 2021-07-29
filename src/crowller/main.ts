@@ -61,30 +61,34 @@ export async function mainProcess(isSync: boolean = false) {
 async function getList(colcode: string, isSync: boolean = false) {
   // 获取列表第一页、总页数
   let url = "http://127.0.0.1:5500/list.html";
-  let { list, totalPage } = await crowller.initSpiderProcess(
-    url,
-    webListanalyzer
-  );
+  // let url = `http://56.23.8.58/ggjtinfo/main2017/channel.jsp?colcode=${colcode}`;
+  // let { list, totalPage } = await crowller.initSpiderProcess(
+  //   url,
+  //   webListanalyzer
+  // );
 
   // 如果不是新旧网站同步模式 且 不只一页，则爬取所有页的列表数据
-  if (!isSync && totalPage > 1) {
-    for (let i = 2; i < totalPage + 1; i++) {
-      let res = await crowller.initSpiderProcess(url, webListanalyzer);
-      list.push(...res.list);
-      // console.log(`page${i}`);
-    }
-  }
+  // if (!isSync && totalPage > 1) {
+  //   for (let i = 2; i < totalPage + 1; i++) {
+  //     let res = await crowller.initSpiderProcess(url, webListanalyzer);
+  //     list.push(...res.list);
+  //     // console.log(`page${i}`);
+  //   }
+  // }
 
-  for (let i = 0; i < list.length; i++) {
+  for (let i = 0; i < 2; i++) {
     await getDetail("");
   }
-  console.log(
-    `${currentCol.value}(id=${currentCol.key}) 共计${totalPage}页， ${list.length}篇文章`
-  );
+  // console.log(
+  //   `${currentCol.value}(id=${currentCol.key}) 共计${totalPage}页， ${list.length}篇文章`
+  // );
 }
 
 async function getDetail(url: string) {
-  url = "http://127.0.0.1:5500/info.html";
+  // url = "http://127.0.0.1:5500/info.html";
+  url = `http://56.23.8.58/ggjtinfo/main2017/read.jsp?colcode=01&id=22105`;
+  // url = "http://127.0.0.1:5500/infogb2312.html";
+
   currentUrl = url;
   try {
     let res = await crowller.initSpiderProcess(url, webanalyzer);
@@ -112,7 +116,8 @@ async function postWebinfo(data: any) {
   try {
     const res = await axios({
       method: "POST",
-      url: "http://192.168.233.143:8078/jinan-system-oa/operation/importWebInfo",
+      // url: "http://192.168.233.143:8078/jinan-system-oa/operation/importWebInfo",
+      url: "http://56.18.10.20/jinan-system-oa/operation/importWebInfo",
       ...config,
     });
     postSucessCount++;

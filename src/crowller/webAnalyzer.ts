@@ -1,69 +1,65 @@
-import cheerio  from 'cheerio'
-import moment from "moment"
-import { Analyzer } from "./crowller"
-import { cols } from "./col"
+import cheerio from "cheerio";
+import moment from "moment";
+import { Analyzer } from "./crowller";
+import { cols } from "./col";
 
-interface Course{
-  id: string,
-  title: string
+interface Course {
+  id: string;
+  title: string;
 }
 
-
 export default class WebAnalyzer implements Analyzer {
-  
-  private static instance: Analyzer
-  static getInstance(){
-    if(!WebAnalyzer.instance){
-      WebAnalyzer.instance = new WebAnalyzer()
+  private static instance: Analyzer;
+  static getInstance() {
+    if (!WebAnalyzer.instance) {
+      WebAnalyzer.instance = new WebAnalyzer();
     }
-    return WebAnalyzer.instance
+    return WebAnalyzer.instance;
   }
 
-  
-  public getWebinfo(html: string){
-    const $ = cheerio.load(html)
+  public getWebinfo(html: string) {
+    const $ = cheerio.load(html);
     let webInfo = {
       userId: "1083197870498279426",
       title: $(".area .readtitle").text(),
-      moduleId: this._parsewebModelNode( $(".dqwz").text()),
+      moduleId: this._parsewebModelNode($(".dqwz").text()),
       ...this._parseAuthor($(".area .readinfo").text()),
       images: this._parseImg($(".area .read table img")),
-      attachments: this._parseFile($('#file_list a')),
+      attachments: this._parseFile($("#file_list a")),
       content: this._parseContent(html),
-      sort: 0
-    }
-    // console.log(webInfo)
-    return webInfo
+      sort: 0,
+    };
+    // console.log(webInfo);
+    return webInfo;
   }
   // 解析所属板块
-  private _parsewebModelNode(text:string){
-    let arr = text.split(" >> ")
-    let colName = arr[arr.length-1].trim()
-   
-    let result =  cols.find(item => item.value == colName)
-    return result?.key
-    
+  private _parsewebModelNode(text: string) {
+    let arr = text.split(" >> ");
+    let colName = arr[arr.length - 1].trim();
+
+    let result = cols.find((item) => item.value == colName);
+    return result?.key;
   }
   // 解析作者、发布时间等基础信息
-  private _parseAuthor(authorText: string){
-    let authorArr = authorText.split(" ")
+  private _parseAuthor(authorText: string) {
+    let authorArr = authorText.split(" ");
 
     return {
       releaseUser: authorArr[0].split(":")[1],
       releaseOrg: authorArr[1].split(":")[1],
-      releaseTime: moment( `${authorArr[2].split("：")[1]} ${authorArr[3]}`).unix() * 1000,
-      pv: authorArr[4].split("：")[1] ,
-
-    }
+      releaseTime:
+        moment(`${authorArr[2].split("：")[1]} ${authorArr[3]}`).unix() * 1000,
+      pv: authorArr[4].split("：")[1],
+    };
   }
   // 解析图片
-  private _parseImg(node: any){
-    let prefix = "http://56.23.8.58"
-    let nodeArr:any[] = []
-    node.map((key: any ,value: any) => {
-      nodeArr.push(value)
-    })
-    let result = nodeArr.map(item =>  {
+  private _parseImg(node: any) {
+    let prefix = "http://56.23.8.58";
+    let nodeArr: any[] = [];
+    node.map((key: any, value: any) => {
+      nodeArr.push(value);
+    });
+    let result = nodeArr.map((item) => {
       return {
         status: "success",
         name: item.attribs.src,
@@ -81,19 +77,17 @@ export default class WebAnalyzer implements Analyzer {
           originUrl: prefix + item.attribs.src,
           size: "47540",
         },
-
-        
-      }
-    })
-    return result
+      };
+    });
+    return result;
   }
   // 解析附件
-  private _parseFile(node: any){
-    let nodeArr:any[] = []
-    node.map((key: any ,value: any) => {
-      nodeArr.push(value)
-    })
-    let result = nodeArr.map(item =>  {
+  private _parseFile(node: any) {
+    let nodeArr: any[] = [];
+    node.map((key: any, value: any) => {
+      nodeArr.push(value);
+    });
+    let result = nodeArr.map((item) => {
       return {
         status: "success",
         name: item.children[0].data,
@@ -110,29 +104,26 @@ export default class WebAnalyzer implements Analyzer {
           originUrl: item.attribs.href,
           size: "47540",
         },
-
-      }
-    })
-    return result
+      };
+    });
+    return result;
   }
   // 解析正文
-  private _parseContent(html:string){
-    const $ = cheerio.load(html)
+  private _parseContent(html: string) {
+    const $ = cheerio.load(html);
     // let res =  ($(".read").html()?.split("<!--EndFragment-->")[0].toLowerCase().replace("\n", "") + '</div>').replace("\n", "")
-    $(".read div").remove()
-    $(".read table").remove()
-    $('#file_list ').remove()
-    let res = $(".read").html()
+    $(".read div").remove();
+    $(".read table").remove();
+    $("#file_list ").remove();
+    let res = $(".read").html();
     // console.log(res)
-    return res
+    return res;
   }
 
-  public analyze(html: string){
-    const webInfo = this.getWebinfo(html)
-    return webInfo
+  public analyze(html: string) {
+    const webInfo = this.getWebinfo(html);
+    return webInfo;
     // return JSON.stringify(webInfo)
   }
-  private constructor(){
-    
-  }
+  private constructor() {}
 }
