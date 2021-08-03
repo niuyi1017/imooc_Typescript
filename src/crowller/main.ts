@@ -21,16 +21,23 @@ let getDetailSucessCount = 0;
 let postSucessCount = 0;
 
 // main()
-
-export async function syncWebinfos(during: number = 1000 * 60 * 10) {
-  // setInterval(async () => {
-  mainProcess(true);
-  // }, during)
+// 同步每个模块最新数据
+export async function syncWebinfos(during: number = 1000 * 60 * 60) {
+  currentPage = 1;
+  currentUrl = "";
+  currentTitle = "";
+  totalCount = 0;
+  getDetailSucessCount = 0;
+  postSucessCount = 0;
+  setInterval(async () => {
+    // console.log(during)
+    mainProcess(true);
+  }, during)
 }
-
+// 爬取全量数据
 export async function mainProcess(isSync: boolean = false) {
   let startTime = new Date().getTime();
-  for (let i = 0; i < 1; i++) {
+  for (let i = 1; i < cols.length ; i++) {
     try {
       currentCol = cols[i];
       console.log(
@@ -57,45 +64,59 @@ export async function mainProcess(isSync: boolean = false) {
   );
   console.log(`总共花费${during}秒`);
 }
+// 根据模块code爬取整个模块
+export async function getWebInfosByColcode(colcode:string) {
+  await getList(colcode, false);
+}
 
 async function getList(colcode: string, isSync: boolean = false) {
   // 获取列表第一页、总页数
-  let url = "http://127.0.0.1:5500/list.html";
-  // let url = `http://56.23.8.58/ggjtinfo/main2017/channel.jsp?colcode=${colcode}`;
-  // let { list, totalPage } = await crowller.initSpiderProcess(
-  //   url,
-  //   webListanalyzer
-  // );
+  // let url = "http://127.0.0.1:5500/list.html";
+  let url = `http://56.23.8.58/ggjtinfo/main2017/channel.jsp?colcode=${colcode}`;
+  let { list, totalPage } = await crowller.initSpiderProcess(
+    url,
+    webListanalyzer
+  );
 
   // 如果不是新旧网站同步模式 且 不只一页，则爬取所有页的列表数据
-  // if (!isSync && totalPage > 1) {
-  //   for (let i = 2; i < totalPage + 1; i++) {
-  //     let res = await crowller.initSpiderProcess(url, webListanalyzer);
-  //     list.push(...res.list);
-  //     // console.log(`page${i}`);
-  //   }
-  // }
-
-  for (let i = 0; i < 2; i++) {
-    await getDetail("");
+  if (!isSync && totalPage > 1) {
+    for (let i = 2; i < totalPage + 1; i++) {
+      let _url = `http://56.23.8.58/ggjtinfo/main2017/list.jsp?curpage=${i}&colcode=${colcode}`
+      let res = await crowller.initSpiderProcess(_url, webListanalyzer);
+      list.push(...res.list);
+      console.log(`正在爬取第${i}页列表`);
+    }
   }
-  // console.log(
-  //   `${currentCol.value}(id=${currentCol.key}) 共计${totalPage}页， ${list.length}篇文章`
-  // );
+  // console.log(list)
+  for (let i = 0; i < list.length; i++) {
+    await getDetail(`http://56.23.8.58/ggjtinfo/main2017/${list[i].href}` ,isSync);
+  }
+  console.log(
+    `${currentCol.value}(id=${currentCol.key}) 共计${totalPage}页， ${list.length}篇文章`
+  );
 }
 
-async function getDetail(url: string) {
-  // url = "http://127.0.0.1:5500/info.html";
-  url = `http://56.23.8.58/ggjtinfo/main2017/read.jsp?colcode=01&id=22105`;
-  // url = "http://127.0.0.1:5500/infogb2312.html";
+async function getDetail(url: string,isSync:boolean) {
 
   currentUrl = url;
+  let moduleId = undefined
+  if( url.split("colcode=")[1].split("&")[0]){
+    moduleId = url.split("colcode=")[1].split("&")[0]
+  }
+
+
   try {
     let res = await crowller.initSpiderProcess(url, webanalyzer);
     getDetailSucessCount++;
     currentTitle = res.title;
     if (currentTitle) {
-      console.log(`${currentTitle}  爬取成功   url:${currentUrl}`);
+      // console.log(`${currentTitle}  爬取成功   url:${currentUrl}`);
+    }
+    if(isSync){
+      res.sort = 99999
+    }
+    if(moduleId){
+      res.moduleId = moduleId
     }
     await postWebinfo(res);
   } catch (err) {

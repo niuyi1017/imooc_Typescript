@@ -25,9 +25,9 @@ export default class WebAnalyzer implements Analyzer {
       moduleId: this._parsewebModelNode($(".dqwz").text()),
       ...this._parseAuthor($(".area .readinfo").text()),
       images: this._parseImg($(".area .read table img")),
-      attachments: this._parseFile($("#file_list a")),
-      content: this._parseContent(html),
+      attachments: this._parseFile($("script")[3]),
       sort: 0,
+      content: this._parseContent(html),
     };
     // console.log(webInfo);
     return webInfo;
@@ -42,14 +42,13 @@ export default class WebAnalyzer implements Analyzer {
   }
   // 解析作者、发布时间等基础信息
   private _parseAuthor(authorText: string) {
-    let authorArr = authorText.split(" ");
-
+    let authorArr = authorText.split("   ");
     return {
       releaseUser: authorArr[0].split(":")[1],
       releaseOrg: authorArr[1].split(":")[1],
       releaseTime:
-        moment(`${authorArr[2].split("：")[1]} ${authorArr[3]}`).unix() * 1000,
-      pv: authorArr[4].split("：")[1],
+        moment(`${authorArr[2].split("：")[1]}`).unix() * 1000,
+      pv: Number( authorArr[3].split("：")[1].split(" ")[0])|| '0',
     };
   }
   // 解析图片
@@ -84,24 +83,28 @@ export default class WebAnalyzer implements Analyzer {
   // 解析附件
   private _parseFile(node: any) {
     let nodeArr: any[] = [];
-    node.map((key: any, value: any) => {
-      nodeArr.push(value);
-    });
+    try{
+      nodeArr = `${node.children[0].data.split("[[")[1].split("]]")[0]}`.split("],[") 
+    }catch(err){
+      nodeArr = []
+    }
+    
     let result = nodeArr.map((item) => {
+      item = item.split(",")
       return {
         status: "success",
-        name: item.children[0].data,
+        name: item[1].split("'")[1],
         size: 47540,
         percentage: 100,
         uid: 1627026177527,
         raw: { uid: 1627026177527, percent: 100 },
         response: {
           uid: 1627026177527,
-          name: "姜智勇2006.09荣立一等功.jpg",
+          name: item[1].split("'")[1],
           fid: "5,018f8deda94c01",
-          fileUrl: item.attribs.href,
-          fileName: item.children[0].data,
-          originUrl: item.attribs.href,
+          fileUrl: "http://56.18.10.20" + item[2].split("'")[1],
+          fileName:  item[1].split("'")[1],
+          originUrl: "http://56.18.10.20" + item[2].split("'")[1],
           size: "47540",
         },
       };
@@ -116,14 +119,12 @@ export default class WebAnalyzer implements Analyzer {
     $(".read table").remove();
     $("#file_list ").remove();
     let res = $(".read").html();
-    // console.log(res)
     return res;
   }
 
   public analyze(html: string) {
     const webInfo = this.getWebinfo(html);
     return webInfo;
-    // return JSON.stringify(webInfo)
   }
   private constructor() {}
 }

@@ -1,5 +1,5 @@
 import Router from "koa-router";
-import { mainProcess, syncWebinfos } from "../crowller/main";
+import { mainProcess, syncWebinfos, getWebInfosByColcode } from "../crowller/main";
 const router = new Router();
 
 router
@@ -28,6 +28,23 @@ router
     ctx.response.body = {
       data,
     };
-  });
+  })
+  .get("/getWebInfosByColcode", async (ctx, next) => {
+    let data = ctx.request.query.colcode 
+    if(data){
+      
+      getWebInfosByColcode(`${data}`)
+      ctx.response.body = {
+        data: `正在爬取 colcode 为 ${data}  的模块的全部数据`,
+      };
+
+    }else{
+      ctx.response.body = {
+        data: `colcode 为 ${data},请检查colcode`,
+      };
+    }
+    
+
+  })
 
 export default router;
